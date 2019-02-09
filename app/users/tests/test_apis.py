@@ -35,3 +35,18 @@ class TestUserAPI:
 
         assert response.status_code == 200, 'Login Failed'
         assert response.json()['token'], 'Cannot Receive Token'
+
+    def test_retrieve_api(self, client):
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.get(
+            resolve_url('users:profile', pk=1, ),
+            **header,
+        )
+
+        assert response.status_code == 200, 'User Retrieve Failed'
+        assert not response.json().get('password'), "Don't bring the password."
