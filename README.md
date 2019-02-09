@@ -2,6 +2,10 @@
 
 사용자가 주제에대한 강의를 직접 올리고 공유하는 사이트
 
+## 프로젝트 관리
+
+[Trello](https://trello.com/b/MSp9fCCi)
+
 ## 기능 마인드맵
 
 [MindMeister](https://www.mindmeister.com/1214789074)
