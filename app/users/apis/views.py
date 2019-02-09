@@ -24,3 +24,8 @@ class UserLoginView(APIView):
 class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfileSerializer
+
+    def get_object(self):
+        if not self.kwargs.get('pk'):
+            self.kwargs['pk'] = self.request.user.pk
+        super().get_object()
