@@ -21,3 +21,17 @@ class TestUserAPI:
 
         assert response.status_code == 201, 'Create User API Status Code not 201'
         assert response.json()['token'], 'Create User API no Token Returned'
+
+    def test_login_api(self, client):
+        _ = self._create_users(client, 'asd')
+
+        context = {
+            'user_id': 'asd',
+            'password': 'asd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context)
+
+        assert response.status_code == 200, 'Login Failed'
+        assert response.json()['token'], 'Cannot Receive Token'
