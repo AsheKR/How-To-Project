@@ -12,7 +12,7 @@ class TestUserAPI:
             'nickname': dump,
         }
 
-        response = client.post(resolve_url('users:user_create'),
+        response = client.post(resolve_url('users:create'),
                                data=context)
         return response
 
