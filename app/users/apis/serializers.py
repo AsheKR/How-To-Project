@@ -49,3 +49,11 @@ class UserLoginSerializer(serializers.Serializer):
         return {
             'token': token.key,
         }
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        exclude = (
+            'password',
+        )
