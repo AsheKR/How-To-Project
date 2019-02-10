@@ -15,6 +15,12 @@ class User(AbstractBaseUser, BaseIsDeletedModel, PermissionsMixin):
     description = models.TextField('자기소개', blank=True, null=True)
     profile_image = models.ImageField('프로필 이미지', upload_to='profile/', blank=True, null=True)
 
+    relation_users = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        through='UserRelation',
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = 'user_id'
@@ -27,3 +33,24 @@ class User(AbstractBaseUser, BaseIsDeletedModel, PermissionsMixin):
     def delete(self, using=None, keep_parents=False):
         super().delete()
         Token.objects.filter(user=self).delete()
+
+
+class UserRelation(BaseIsDeletedModel):
+
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='to_user_relations',
+        related_query_name='to_user_relation',
+    )
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='from_user_relations',
+        related_query_name='from_user_relation',
+    )
+
+    class Meta:
+        unique_together = (
+            ('to_user', 'from_user'),
+        )

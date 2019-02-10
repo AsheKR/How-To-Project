@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
+from users.models import UserRelation
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,4 +63,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'email',
             'user_id',
+        )
+
+
+class UserRelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserRelation
+        exclude = (
+            'deleted_at',
         )

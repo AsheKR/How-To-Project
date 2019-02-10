@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, status
+from django.utils.timezone import now
+from rest_framework import generics, status, serializers
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from users.apis.serializers import UserCreateSerializer, UserLoginSerializer, UserProfileSerializer
+from users.apis.serializers import UserCreateSerializer, UserLoginSerializer, UserProfileSerializer, \
+    UserRelationSerializer
+from users.models import UserRelation
 
 User = get_user_model()
 
@@ -34,3 +38,20 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
         if not self.kwargs.get('pk'):
             self.kwargs['pk'] = self.request.user.pk
         return super().get_object()
+
+
+class UserFollowCreateListGenericAPIView(generics.ListCreateAPIView):
+    queryset = UserRelation
+    serializer_class = UserRelationSerializer
+
+    def create(self, request, *args, **kwargs):
+        obj, created = UserRelation.objects.update_or_create(
+            from_user=request.user,
+            to_user=get_object_or_404(User.objects.filter(deleted_at=None), pk=kwargs.get('to_user_pk')),
+            defaults={'deleted_at': now()},
+        )
+
+        if not created:
+            obj.save(deleted_at=None)
+
+        return Response(status=status.HTTP_201_CREATED)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/', views.UserProfileGenericAPIView.as_view(), name='profile'),
     path('me/', views.UserProfileGenericAPIView.as_view(), name='me-profile'),
     path('login/', views.UserLoginView.as_view(), name='login'),
+    path('following/<int:to_user_pk>/', views.UserFollowCreateListGenericAPIView.as_view(), name='follow')
 ]
