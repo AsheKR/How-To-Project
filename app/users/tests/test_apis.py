@@ -50,6 +50,7 @@ class TestUserAPI:
 
         assert response.status_code == 200, 'User Retrieve Failed'
         assert not response.json().get('password'), "Don't bring the password."
+        assert not response.json().get('password'), "Don't bring deleted_at."
 
     def test_me_retrieve_api(self, client):
         response = self._create_users(client, 'asd')
@@ -64,3 +65,4 @@ class TestUserAPI:
         )
 
         assert response.status_code == 200, 'User Retrieve Failed'
+

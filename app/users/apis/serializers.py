@@ -56,4 +56,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = get_user_model()
         exclude = (
             'password',
+            'deleted_at',
         )
