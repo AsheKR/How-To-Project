@@ -1,3 +1,4 @@
+import pytest
 from django.shortcuts import resolve_url
 
 from base.base_test_mixins import BaseTestMixin
@@ -91,3 +92,13 @@ class TestUserAPI(BaseTestMixin):
 
         assert response.status_code == 204, 'User Delete Failed'
         assert django_user_model.objects.get(pk=1).deleted_at, 'User Not Deleted'
+
+
+class TestUserAPIValidation(BaseTestMixin):
+
+    def test_anonymous_retrieve_me(self, client):
+        response = client.get(
+            resolve_url('users:me-profile', ),
+        )
+
+        assert response.status_code == 403
