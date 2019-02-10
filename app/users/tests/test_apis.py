@@ -219,8 +219,34 @@ class TestUserRelationAPI(BaseTestMixin):
         _ = self._create_follow(client, header, 1)
 
         response = client.get(
-            resolve_url('users:follow', to_user_pk=1),
+            resolve_url('users:following', to_user_pk=1),
             **header,
         )
 
         assert len(response.json()) == 2
+
+    def test_get_following_list_except_un_follow(self, client):
+        _ = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 1)
+
+        response = self._create_users(client, 'qwe')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 1)
+
+        response = client.get(
+            resolve_url('users:following', to_user_pk=1),
+            **header,
+        )
+
+        assert len(response.json()) == 1

@@ -40,11 +40,14 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
         return super().get_object()
 
 
-class UserFollowCreateListGenericAPIView(generics.ListCreateAPIView):
-    queryset = UserRelation
-    serializer_class = UserRelationSerializer
+class UserFollowCreateListAPIView(APIView):
 
-    def create(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.filter(from_user_relation__to_user=kwargs.get('to_user_pk'),)
+        serializer = UserProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
         obj, created = UserRelation.objects.get_or_create(
             from_user=request.user,
             to_user=get_object_or_404(User.objects.filter(deleted_at=None), pk=kwargs.get('to_user_pk')),
