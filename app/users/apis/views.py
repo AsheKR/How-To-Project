@@ -1,13 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
-from rest_framework import generics, status, serializers
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from users.apis.serializers import UserCreateSerializer, UserLoginSerializer, UserProfileSerializer, \
-    UserRelationSerializer
+from users.apis.permissions import IsOwnerorReadOnly
+from users.apis.serializers import UserCreateSerializer, UserLoginSerializer, UserProfileSerializer
 from users.models import UserRelation
 
 User = get_user_model()
@@ -29,6 +28,9 @@ class UserLoginView(APIView):
 class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfileSerializer
+    permission_classes = (
+        IsOwnerorReadOnly,
+    )
 
     def get_queryset(self):
         queryset = super().get_queryset()
