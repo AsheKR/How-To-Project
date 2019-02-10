@@ -32,7 +32,5 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         if not self.kwargs.get('pk'):
-            if self.request.user.pk is None:
-                raise PermissionDenied({'detail': '로그인된 유저가 아닙니다.'})
             self.kwargs['pk'] = self.request.user.pk
         return super().get_object()
