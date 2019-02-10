@@ -87,3 +87,19 @@ class TestUserAPI:
         )
 
         assert response.status_code == 200, 'User Patch Failed'
+
+    def test_destroy_api(self, client, django_user_model):
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.delete(
+            resolve_url('users:profile', pk=1, ),
+            **header,
+            content_type="application/json"
+        )
+
+        assert response.status_code == 204, 'User Delete Failed'
+        assert django_user_model.objects.get(pk=1).deleted_at, 'User Not Deleted'
