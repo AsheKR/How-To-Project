@@ -25,3 +25,14 @@ class TestUserModel(BaseTestMixin):
         )
 
         assert user == django_user_model.objects.first()
+
+    def test_delete_generates_deleted_at(self, django_user_model):
+        user = django_user_model.objects.create(
+            user_id='asd',
+            password='asd',
+            email='asd@asd.com',
+        )
+
+        assert not user.deleted_at
+        user.delete()
+        assert user.deleted_at
