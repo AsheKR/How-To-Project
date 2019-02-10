@@ -142,3 +142,23 @@ class TestUserAPIValidation(BaseTestMixin):
             )
 
             assert getattr(origin_user, field_name) == getattr(django_user_model.objects.first(), field_name)
+
+
+class TestUserRelationAPI(BaseTestMixin):
+
+    def test_create_follow_api(self, client, django_user_model):
+        _ = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        assert response.status_code == 201
+        assert django_user_model.objects.filter(from_user_relation__from_user=django_user_model.objects.get(pk=2),
+                                                from_user_relation__to_user=django_user_model.objects.get(pk=1)).exists()
