@@ -28,4 +28,4 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         if not self.kwargs.get('pk'):
             self.kwargs['pk'] = self.request.user.pk
-        super().get_object()
+        return super().get_object()
