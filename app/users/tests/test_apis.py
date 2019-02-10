@@ -1,21 +1,9 @@
-import pytest
 from django.shortcuts import resolve_url
 
+from base.base_test_mixins import BaseTestMixin
 
-class TestUserAPI:
 
-    @staticmethod
-    def _create_users(client, dump):
-        context = {
-            'user_id': dump,
-            'password': 'asd',
-            'email': dump+'@'+dump+'.com',
-            'nickname': dump,
-        }
-
-        response = client.post(resolve_url('users:create'),
-                               data=context)
-        return response
+class TestUserAPI(BaseTestMixin):
 
     def test_create_user_api(self, client):
         response = self._create_users(client, 'asd')
