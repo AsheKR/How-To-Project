@@ -1,3 +1,4 @@
+import pytest
 from django.shortcuts import resolve_url
 
 
@@ -66,3 +67,23 @@ class TestUserAPI:
 
         assert response.status_code == 200, 'User Retrieve Failed'
 
+    def test_patch_api(self, client):
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'nickname': '프와송',
+            'description': '송와프',
+        }
+
+        response = client.patch(
+            resolve_url('users:profile', pk=1, ),
+            **header,
+            data=context,
+            content_type="application/json"
+        )
+
+        assert response.status_code == 200, 'User Patch Failed'
