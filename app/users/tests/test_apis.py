@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 import pytest
 from django.shortcuts import resolve_url
+from django.utils.timezone import now
 
 from base.base_test_mixins import BaseTestMixin
 
@@ -102,3 +105,30 @@ class TestUserAPIValidation(BaseTestMixin):
         )
 
         assert response.status_code == 403
+
+    def test_patch_me_read_only_fields_error(self, client, django_user_model):
+        response = self._create_users(client, 'asd')
+
+        item_time = now() - timedelta(days=3)
+
+        items = (
+            ('created_at', item_time),
+            ('deleted_at', item_time),
+            ('password', 'qwe'),
+        )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        origin_user = django_user_model.objects.first()
+
+        for field_name, field_value in items:
+            response = client.patch(
+                resolve_url('users:profile', pk=1, ),
+                **header,
+                data={field_name: field_value},
+                content_type="application/json"
+            )
+
+            assert getattr(origin_user, field_name) == getattr(django_user_model.objects.first(), field_name)
