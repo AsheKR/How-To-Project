@@ -106,7 +106,6 @@ class TestUserAPIValidation(BaseTestMixin):
 
         assert response.status_code == 404
 
-    @pytest.mark.smoke
     def test_cannot_retrieve_deleted_user(self, client, django_user_model):
         response = self._create_users(client, 'asd')
         django_user_model.objects.first().delete()
