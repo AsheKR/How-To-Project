@@ -58,3 +58,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'password',
             'deleted_at',
         )
+        read_only_fields = (
+            'email',
+            'user_id',
+        )
