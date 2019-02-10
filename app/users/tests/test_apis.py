@@ -5,6 +5,7 @@ from django.shortcuts import resolve_url
 from django.utils.timezone import now
 
 from base.base_test_mixins import BaseTestMixin
+from users.models import UserRelation
 
 
 class TestUserAPI(BaseTestMixin):
@@ -161,4 +162,60 @@ class TestUserRelationAPI(BaseTestMixin):
 
         assert response.status_code == 201
         assert django_user_model.objects.filter(from_user_relation__from_user=django_user_model.objects.get(pk=2),
-                                                from_user_relation__to_user=django_user_model.objects.get(pk=1)).exists()
+                                                from_user_relation__to_user=django_user_model.objects.get(pk=1)
+                                                ).exists()
+
+    @pytest.mark.smoke
+    def test_un_follow_api(self, client, django_user_model):
+        _ = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        response = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        assert response.status_code == 204
+        assert UserRelation.objects.get(
+            from_user=django_user_model.objects.get(pk=2),
+            to_user=django_user_model.objects.get(pk=1),
+        ).deleted_at is not None
+
+    @pytest.mark.smoke
+    def test_follow_after_un_follow(self, client, django_user_model):
+        _ = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        _ = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        response = client.post(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        assert response.status_code == 201
+        assert UserRelation.objects.get(
+            from_user=django_user_model.objects.get(pk=2),
+            to_user=django_user_model.objects.get(pk=1),
+        ).deleted_at is None
