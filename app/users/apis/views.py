@@ -40,10 +40,12 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
         return super().get_object()
 
 
-class UserFollowCreateListAPIView(APIView):
+class UserFollowingCreateListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.filter(from_user_relation__to_user=kwargs.get('to_user_pk'),)
+        queryset = User.objects.filter(from_user_relation__to_user=kwargs.get('to_user_pk'),
+                                       from_user_relation__deleted_at=None,
+                                       )
         serializer = UserProfileSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -64,3 +66,13 @@ class UserFollowCreateListAPIView(APIView):
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_201_CREATED)
+
+
+class UserFollowerListAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.filter(to_user_relation__from_user=kwargs.get('from_user_pk'),
+                                       to_user_relation__deleted_at=None,
+                                       )
+        serializer = UserProfileSerializer(queryset, many=True)
+        return Response(serializer.data)

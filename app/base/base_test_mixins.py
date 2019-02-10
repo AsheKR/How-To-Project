@@ -19,7 +19,7 @@ class BaseTestMixin:
     @staticmethod
     def _create_follow(client, header, to_user_pk):
         response = client.post(
-            resolve_url('users:follow', to_user_pk=to_user_pk),
+            resolve_url('users:following', to_user_pk=to_user_pk),
             **header,
         )
 
