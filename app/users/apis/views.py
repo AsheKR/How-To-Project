@@ -45,13 +45,19 @@ class UserFollowCreateListGenericAPIView(generics.ListCreateAPIView):
     serializer_class = UserRelationSerializer
 
     def create(self, request, *args, **kwargs):
-        obj, created = UserRelation.objects.update_or_create(
+        obj, created = UserRelation.objects.get_or_create(
             from_user=request.user,
             to_user=get_object_or_404(User.objects.filter(deleted_at=None), pk=kwargs.get('to_user_pk')),
-            defaults={'deleted_at': now()},
         )
 
         if not created:
-            obj.save(deleted_at=None)
+            if obj.deleted_at:
+                obj.deleted_at = None
+                obj.save()
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                obj.deleted_at = now()
+                obj.save()
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_201_CREATED)
