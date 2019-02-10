@@ -15,3 +15,12 @@ class BaseTestMixin:
         response = client.post(resolve_url('users:create'),
                                data=context)
         return response
+
+    @staticmethod
+    def _create_follow(client, header, to_user_pk):
+        response = client.post(
+            resolve_url('users:follow', to_user_pk=to_user_pk),
+            **header,
+        )
+
+        return response
