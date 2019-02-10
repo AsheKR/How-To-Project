@@ -199,3 +199,28 @@ class TestUserRelationAPI(BaseTestMixin):
             from_user=django_user_model.objects.get(pk=2),
             to_user=django_user_model.objects.get(pk=1),
         ).deleted_at is None
+
+    def test_get_following_list_api(self, client):
+        _ = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 1)
+
+        response = self._create_users(client, 'qwe')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 1)
+
+        response = client.get(
+            resolve_url('users:follow', to_user_pk=1),
+            **header,
+        )
+
+        assert len(response.json()) == 2
