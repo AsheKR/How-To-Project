@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from rest_framework.authtoken.models import Token
 
 from base.base_models import BaseIsDeletedModel
 from users.managers import UserManager
@@ -22,3 +23,7 @@ class User(AbstractBaseUser, BaseIsDeletedModel, PermissionsMixin):
     class Meta:
         verbose_name = ('유저', )
         verbose_name_plural = ('유저', )
+
+    def delete(self, using=None, keep_parents=False):
+        super().delete()
+        Token.objects.filter(user=self).delete()

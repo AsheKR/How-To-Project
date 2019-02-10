@@ -26,6 +26,10 @@ class UserProfileGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfileSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(deleted_at=None)
+
     def get_object(self):
         if not self.kwargs.get('pk'):
             if self.request.user.pk is None:
