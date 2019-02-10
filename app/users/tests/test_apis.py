@@ -107,6 +107,28 @@ class TestUserAPIValidation(BaseTestMixin):
 
         assert response.status_code == 404
 
+    def test_cannot_patch_by_non_owner(self, client):
+        _ = self._create_users(client, 'asd')
+        response = self._create_users(client, 'qwe')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'nickname': '프와송',
+            'description': '송와프',
+        }
+
+        response = client.patch(
+            resolve_url('users:profile', pk=1, ),
+            **header,
+            data=context,
+            content_type="application/json"
+        )
+
+        assert response.status_code == 403
+
     def test_cannot_retrieve_deleted_user(self, client, django_user_model):
         response = self._create_users(client, 'asd')
         django_user_model.objects.first().delete()
