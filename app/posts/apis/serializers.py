@@ -16,10 +16,12 @@ class PostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         exclude_fields = (
             'deleted_at',
+            'like_users',
         )
         read_only_fields = (
             'author',
             'category',
+            'like_users',
         )
 
     def create(self, validated_data):

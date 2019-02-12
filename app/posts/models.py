@@ -26,18 +26,15 @@ class Post(BaseIsDeletedModel):
     like_users = models.ManyToManyField(
         get_user_model(),
         symmetrical=False,
+        blank=True,
+        related_name='like_users',
+        related_query_name='like_user',
     )
 
     def like_toggle(self, user):
-        obj, created = self.like_users.get_or_create(pk=user.pk)
-
-        if not created:
-            if obj.deleted_at:
-                obj.deleted_at = None
-                obj.save()
-            else:
-                obj.deleted_at = now()
-                obj.save()
-                return status.HTTP_204_NO_CONTENT
-
-        return status.HTTP_201_CREATED
+        if self.like_users.filter(pk=user.pk).exists():
+            self.like_users.remove(user)
+            return status.HTTP_204_NO_CONTENT
+        else:
+            self.like_users.add(user)
+            return status.HTTP_201_CREATED
