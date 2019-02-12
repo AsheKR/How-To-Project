@@ -1,5 +1,7 @@
 from django.shortcuts import resolve_url
 
+from posts.models import PostCategory
+
 
 class BaseTestMixin:
 
@@ -24,3 +26,8 @@ class BaseTestMixin:
         )
 
         return response
+
+    @staticmethod
+    def _create_post_category():
+        PostCategory.objects.create(name='category1')
+        PostCategory.objects.create(name='category2')
