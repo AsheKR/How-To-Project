@@ -97,3 +97,29 @@ class TestPostAPI(BaseTestMixin):
         )
 
         assert response.status_code == 204
+
+    def test_like_api(self, client):
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token']
+        }
+
+        context = {
+            'category': 'category1',
+            'title': 'title1',
+            'content': 'content',
+        }
+
+        _ = client.post(
+            resolve_url('posts:list_create'),
+            **header,
+            data=context,
+        )
+
+        response = client.post(
+            resolve_url('posts:like', pk=1),
+            **header,
+        )
+
+        assert response.status_code == 201
