@@ -273,3 +273,32 @@ class TestUserRelationAPI(BaseTestMixin):
         )
 
         assert len(response.json()) == 1
+
+    def test_me_following_list_api(self, client):
+        check_me = self._create_users(client, 'sdf')
+        response = self._create_users(client, 'asd')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 'sdf')
+
+        response = self._create_users(client, 'qwe')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_follow(client, header, 'sdf')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + check_me.json()['token'],
+        }
+
+        response = client.get(
+            resolve_url('users:me-following'),
+            **header,
+        )
+
+        assert len(response.json()) == 2
