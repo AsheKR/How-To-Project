@@ -38,11 +38,12 @@ class TestUserAPI(BaseTestMixin):
         }
 
         response = client.get(
-            resolve_url('users:profile', pk=1, ),
+            resolve_url('users:profile', user_id='asd', ),
             **header,
         )
 
         assert response.status_code == 200, 'User Retrieve Failed'
+        assert response.json().get('nickname'), 'User Retrieve Failed'
         assert not response.json().get('password'), "Don't bring the password."
         assert not response.json().get('password'), "Don't bring deleted_at."
 
@@ -60,7 +61,7 @@ class TestUserAPI(BaseTestMixin):
 
         assert response.status_code == 200, 'User Retrieve Failed'
 
-    def test_patch_api(self, client):
+    def test_me_patch_api(self, client):
         response = self._create_users(client, 'asd')
 
         header = {
@@ -73,7 +74,7 @@ class TestUserAPI(BaseTestMixin):
         }
 
         response = client.patch(
-            resolve_url('users:profile', pk=1, ),
+            resolve_url('users:me-profile'),
             **header,
             data=context,
             content_type="application/json"
@@ -81,7 +82,7 @@ class TestUserAPI(BaseTestMixin):
 
         assert response.status_code == 200, 'User Patch Failed'
 
-    def test_destroy_api(self, client, django_user_model):
+    def test_me_destroy_api(self, client, django_user_model):
         response = self._create_users(client, 'asd')
 
         header = {
@@ -89,7 +90,7 @@ class TestUserAPI(BaseTestMixin):
         }
 
         response = client.delete(
-            resolve_url('users:profile', pk=1, ),
+            resolve_url('users:me-profile'),
             **header,
             content_type="application/json"
         )
@@ -105,39 +106,7 @@ class TestUserAPIValidation(BaseTestMixin):
             resolve_url('users:me-profile', ),
         )
 
-        assert response.status_code == 404
-
-    def test_cannot_patch_by_non_owner(self, client):
-        _ = self._create_users(client, 'asd')
-        response = self._create_users(client, 'qwe')
-
-        header = {
-            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
-        }
-
-        context = {
-            'nickname': '프와송',
-            'description': '송와프',
-        }
-
-        response = client.patch(
-            resolve_url('users:profile', pk=1, ),
-            **header,
-            data=context,
-            content_type="application/json"
-        )
-
-        assert response.status_code == 403
-
-    def test_cannot_retrieve_deleted_user(self, client, django_user_model):
-        response = self._create_users(client, 'asd')
-        django_user_model.objects.first().delete()
-
-        response = client.get(
-            resolve_url('users:profile', pk=1, ),
-        )
-
-        assert response.status_code == 404
+        assert response.status_code == 401
 
     def test_patch_me_read_only_fields_error(self, client, django_user_model):
         response = self._create_users(client, 'asd')
@@ -158,7 +127,7 @@ class TestUserAPIValidation(BaseTestMixin):
 
         for field_name, field_value in items:
             response = client.patch(
-                resolve_url('users:profile', pk=1, ),
+                resolve_url('users:me-profile'),
                 **header,
                 data={field_name: field_value},
                 content_type="application/json"
@@ -177,7 +146,7 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        response = self._create_follow(client, header, 1)
+        response = self._create_follow(client, header, 'sdf')
 
         assert response.status_code == 201
         assert django_user_model.objects.filter(from_user_relation__from_user=django_user_model.objects.get(pk=2),
@@ -192,9 +161,9 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
-        response = self._create_follow(client, header, 1)
+        response = self._create_follow(client, header, 'sdf')
 
         assert response.status_code == 204
         assert UserRelation.objects.get(
@@ -210,11 +179,11 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
-        response = self._create_follow(client, header, 1)
+        response = self._create_follow(client, header, 'sdf')
 
         assert response.status_code == 201
         assert UserRelation.objects.get(
@@ -230,7 +199,7 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
         response = self._create_users(client, 'qwe')
 
@@ -238,10 +207,10 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
         response = client.get(
-            resolve_url('users:following', to_user_pk=1),
+            resolve_url('users:following', user_id='sdf'),
             **header,
         )
 
@@ -255,7 +224,7 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
         response = self._create_users(client, 'qwe')
 
@@ -263,11 +232,11 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
+        _ = self._create_follow(client, header, 'sdf')
 
         response = client.get(
-            resolve_url('users:following', to_user_pk=1),
+            resolve_url('users:following', user_id='sdf'),
             **header,
         )
 
@@ -281,7 +250,7 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
         response = self._create_users(client, 'qwe')
 
@@ -289,17 +258,17 @@ class TestUserRelationAPI(BaseTestMixin):
             'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
         }
 
-        _ = self._create_follow(client, header, 1)
+        _ = self._create_follow(client, header, 'sdf')
 
         response = client.get(
-            resolve_url('users:follower', from_user_pk=1),
+            resolve_url('users:follower', user_id='sdf'),
             **header,
         )
 
         assert len(response.json()) == 0
 
         response = client.get(
-            resolve_url('users:follower', from_user_pk=2),
+            resolve_url('users:follower', user_id='asd'),
             **header,
         )
 
