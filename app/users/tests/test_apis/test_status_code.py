@@ -116,7 +116,7 @@ class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         assert json['errors'][0]['field'] == 'password'
 
     def test_create_user_password_must_contain_at_least_1_character(self, client):
-        context = self._get_context(password='Password')
+        context = self._get_context(password='Passw0rd')
 
         response = self._create_users_with_context(client, context)
 
