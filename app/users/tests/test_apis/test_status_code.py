@@ -1,15 +1,23 @@
 from base.base_test_mixins import BaseTestMixin
 
 
-class TestUserStatusCodeAPI(BaseTestMixin):
+class BaseTestUserContext:
+
+    @staticmethod
+    def _get_context(user_id='asd123', password='P@ssw04d',
+                     email='test@test.com', nickname='지존짱짱맨'):
+        return {
+            'user_id': user_id,
+            'password': password,
+            'email': email,
+            'nickname': nickname,
+        }
+
+
+class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
     def test_create_user_require_fields_occur_400(self, client):
-        context = {
-            'user_id': '',
-            'password': '',
-            'email': '',
-            'nickname': '',
-        }
+        context = self._get_context('', '', '', '')
 
         response = self._create_users_with_context(client, context)
 
@@ -21,13 +29,7 @@ class TestUserStatusCodeAPI(BaseTestMixin):
             assert json['errors'][i]['field'] == key
 
     def test_create_user_user_id_start_with_numbers_occur_400(self, client):
-        context = {
-            'user_id': '1asdf11',
-            'password': 'asd',
-            'email': 'asd@asd.com',
-            'nickname': 'asd',
-        }
-
+        context = self._get_context('1asdf11')
         response = self._create_users_with_context(client, context)
 
         assert response.status_code == 400
@@ -37,12 +39,7 @@ class TestUserStatusCodeAPI(BaseTestMixin):
         assert json['errors'][0]['field'] == 'user_id'
 
     def test_create_user_user_id_at_least_5_characters_long(self, client):
-        context = {
-            'user_id': 'asd',
-            'password': 'asd',
-            'email': 'asd@asd.com',
-            'nickname': 'asd',
-        }
+        context = self._get_context('four')
 
         response = self._create_users_with_context(client, context)
 
@@ -53,12 +50,7 @@ class TestUserStatusCodeAPI(BaseTestMixin):
         assert json['errors'][0]['field'] == 'user_id'
 
     def test_create_user_user_id_maximum_15_characters_long(self, client):
-        context = {
-            'user_id': 'a234567890123456',
-            'password': 'asd',
-            'email': 'asd@asd.com',
-            'nickname': 'asd',
-        }
+        context = self._get_context('a234567890123456')
 
         response = self._create_users_with_context(client, context)
 
