@@ -41,6 +41,29 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
 
         return value
 
+    def validate_password(self, value):
+        if len(value) < 8:
+            self.register_error(error_message='password must at least 8 characters long.',
+                                error_code='2051',
+                                field_name='password')
+
+        if re.findall(r'\d', value):
+            self.register_error(error_message='password must contain at least 1 digit, 0-9',
+                                error_code='2013',
+                                field_name='password')
+
+        if re.findall(r'[A-Z]', value):
+            self.register_error(error_message='password must contain at least 1 uppercase letter, A-Z.',
+                                error_code='2013',
+                                field_name='password')
+
+        if re.findall(r'[()[\]{}|\\`~!@#$%^&*\+=;:\'",<>./?]', value):
+            self.register_error(error_message='password must contain at least 1 special character',
+                                error_code='2013',
+                                field_name='password')
+
+        return value
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = None
