@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework_friendly_errors.mixins import FriendlyErrorMessagesMixin
 
 from users.models import UserRelation
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = (
