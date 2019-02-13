@@ -10,6 +10,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+MEDIA_ROOT = os.path.join(ROOT_DIR, '.media')
+
 WSGI_APPLICATION = 'config.wsgi.dev.application'
 
 # Database

@@ -19,6 +19,7 @@ SECRET_DIR = os.path.join(ROOT_DIR, '.secret')
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_JSON = json.load(open(os.path.join(SECRET_DIR, 'secrets.json')))
