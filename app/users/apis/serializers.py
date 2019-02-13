@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -15,6 +17,29 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
             'email',
             'nickname',
         )
+
+    def validate_user_id(self, value):
+        if value[0].isdigit():
+            self.register_error(error_message='user_id should not begin with number.',
+                                error_code='2013',
+                                field_name='user_id')
+
+        if not value.islower():
+            self.register_error(error_message='user_id must lowercase.',
+                                error_code='2013',
+                                field_name='user_id')
+
+        if re.findall(r'[()[\]{}|\\`~!@#$%^&*\+=;:\'",<>./?]', value):
+            self.register_error(error_message='user_id allow special character only "-" and "_"',
+                                error_code='2013',
+                                field_name='user_id')
+
+        if len(value) < 5:
+            self.register_error(error_message='user_id must at least 5 characters long.',
+                                error_code='2051',
+                                field_name='user_id')
+
+        return value
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
