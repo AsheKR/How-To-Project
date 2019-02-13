@@ -14,7 +14,7 @@ class BaseTestUserContext:
         }
 
 
-class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
+class TestRequiredFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
     def test_create_user_require_fields_occur_400(self, client):
         context = self._get_context('', '', '', '')
@@ -27,6 +27,9 @@ class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         for i, key in enumerate(tuple(context)):
             assert json['errors'][i]['code'] == '2031'
             assert json['errors'][i]['field'] == key
+
+
+class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
     def test_create_user_user_id_start_with_numbers_occur_400(self, client):
         context = self._get_context('1asdf11')
@@ -125,4 +128,3 @@ class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'password'
-
