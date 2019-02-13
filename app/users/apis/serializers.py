@@ -13,7 +13,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'password',
             'email',
             'nickname',
-            'profile_image',
         )
 
     def __init__(self, *args, **kwargs):
