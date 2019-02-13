@@ -81,3 +81,14 @@ class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'user_id'
+
+    def test_create_user_password_at_least_8_characters_long(self, client):
+        context = self._get_context(password='P@ssw0r')
+
+        response = self._create_users_with_context(client, context)
+
+        assert response.status_code == 400
+        json = response.json()
+
+        assert json['errors'][0]['code'] == '2051'
+        assert json['errors'][0]['field'] == 'user_id'
