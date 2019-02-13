@@ -40,6 +40,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'user_id'
+        assert '이 필드는 숫자로 시작하면 안됩니다.' in json['errors'][0]['message']
 
     def test_create_user_user_id_at_least_5_characters_long(self, client):
         context = self._get_context('four')
@@ -51,6 +52,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2051'
         assert json['errors'][0]['field'] == 'user_id'
+        assert '이 필드의 글자 수가 5자 이상인지 확인하십시오.' in json['errors'][0]['message']
 
     def test_create_user_user_id_maximum_15_characters_long(self, client):
         context = self._get_context('a234567890123456')
@@ -62,6 +64,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2041'
         assert json['errors'][0]['field'] == 'user_id'
+        assert '이 필드의 글자 수가 15 이하인지 확인하십시오.' in json['errors'][0]['message']
 
     def test_create_user_user_id_not_allow_uppercase(self, client):
         context = self._get_context('A0lowercase')
@@ -73,6 +76,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'user_id'
+        assert '이 필드는 반드시 소문자로 작성되어야합니다.' in json['errors'][0]['message']
 
     def test_create_user_user_id_not_allow_special_character_except_hypen_and_underline(self, client):
         context = self._get_context('[d(-_-)b]')
@@ -84,6 +88,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'user_id'
+        assert '유저 아이디에는 오직 "_"와 "-"만 허용합니다.' in json['errors'][0]['message']
 
     def test_create_user_password_at_least_8_characters_long(self, client):
         context = self._get_context(password='P@ssw0r')
@@ -95,6 +100,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2051'
         assert json['errors'][0]['field'] == 'password'
+        assert '이 필드의 글자 수가 8자 이상인지 확인하십시오.' in json['errors'][0]['message']
 
     def test_create_user_password_must_contain_at_least_1_digit(self, client):
         context = self._get_context(password='P@ssword')
@@ -106,9 +112,10 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'password'
+        assert '이 필드는 반드시 하나 이상의 숫자를 포함하여야 합니다' in json['errors'][0]['message']
 
     def test_create_user_password_must_contain_at_least_1_uppercase(self, client):
-        context = self._get_context(password='p@ssword')
+        context = self._get_context(password='p@ssw0rd')
 
         response = self._create_users_with_context(client, context)
 
@@ -117,6 +124,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'password'
+        assert '이 필드는 반드시 A-Z까지의 대문자를 포함하여야 합니다.' in json['errors'][0]['message']
 
     def test_create_user_password_must_contain_at_least_1_character(self, client):
         context = self._get_context(password='Passw0rd')
@@ -128,3 +136,4 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '2013'
         assert json['errors'][0]['field'] == 'password'
+        assert '이 필드는 반드시 특수문자가 하나 이상 포함되어야 합니다.' in json['errors'][0]['message']

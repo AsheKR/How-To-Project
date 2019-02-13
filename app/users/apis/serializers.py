@@ -20,22 +20,22 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
 
     def validate_user_id(self, value):
         if value[0].isdigit():
-            self.register_error(error_message='user_id should not begin with number.',
+            self.register_error(error_message='이 필드는 숫자로 시작하면 안됩니다.',
                                 error_code='2013',
                                 field_name='user_id')
 
         if not value.islower():
-            self.register_error(error_message='user_id must lowercase.',
+            self.register_error(error_message='이 필드는 반드시 소문자로 작성되어야합니다.',
                                 error_code='2013',
                                 field_name='user_id')
 
         if re.findall(r'[()[\]{}|\\`~!@#$%^&*\+=;:\'",<>./?]', value):
-            self.register_error(error_message='user_id allow special character only "-" and "_"',
+            self.register_error(error_message='유저 아이디에는 오직 "_"와 "-"만 허용합니다.',
                                 error_code='2013',
                                 field_name='user_id')
 
         if len(value) < 5:
-            self.register_error(error_message='user_id must at least 5 characters long.',
+            self.register_error(error_message='이 필드의 글자 수가 5자 이상인지 확인하십시오.',
                                 error_code='2051',
                                 field_name='user_id')
 
@@ -43,22 +43,22 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
 
     def validate_password(self, value):
         if len(value) < 8:
-            self.register_error(error_message='password must at least 8 characters long.',
+            self.register_error(error_message='이 필드의 글자 수가 8자 이상인지 확인하십시오.',
                                 error_code='2051',
                                 field_name='password')
 
-        if re.findall(r'\d', value):
-            self.register_error(error_message='password must contain at least 1 digit, 0-9',
+        if not re.search(r'\d', value):
+            self.register_error(error_message='이 필드는 반드시 하나 이상의 숫자를 포함하여야 합니다.',
                                 error_code='2013',
                                 field_name='password')
 
-        if re.findall(r'[A-Z]', value):
-            self.register_error(error_message='password must contain at least 1 uppercase letter, A-Z.',
+        if not re.search(r'[A-Z]', value):
+            self.register_error(error_message='이 필드는 반드시 A-Z까지의 대문자를 포함하여야 합니다.',
                                 error_code='2013',
                                 field_name='password')
 
-        if re.findall(r'[()[\]{}|\\`~!@#$%^&*\+=;:\'",<>./?]', value):
-            self.register_error(error_message='password must contain at least 1 special character',
+        if not re.findall(r'[()[\]{}|\\`~!@#$%^&*\+=;:\'",<>./?]', value):
+            self.register_error(error_message='이 필드는 반드시 특수문자가 하나 이상 포함되어야 합니다.',
                                 error_code='2013',
                                 field_name='password')
 

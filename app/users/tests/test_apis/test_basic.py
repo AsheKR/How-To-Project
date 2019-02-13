@@ -24,7 +24,7 @@ class TestUserBasicAPI(BaseTestMixin):
     def test_create_user_api_required_fields(self, client):
         context = {
             'user_id': 'user_id',
-            'password': 'password',
+            'password': 'P@ssw0rd',
             'email': 'email@email.com',
             'nickname': 'nickname'
         }
