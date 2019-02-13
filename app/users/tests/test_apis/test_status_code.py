@@ -91,4 +91,38 @@ class TestUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         json = response.json()
 
         assert json['errors'][0]['code'] == '2051'
-        assert json['errors'][0]['field'] == 'user_id'
+        assert json['errors'][0]['field'] == 'password'
+
+    def test_create_user_password_must_contain_at_least_1_digit(self, client):
+        context = self._get_context(password='P@ssword')
+
+        response = self._create_users_with_context(client, context)
+
+        assert response.status_code == 400
+        json = response.json()
+
+        assert json['errors'][0]['code'] == '2013'
+        assert json['errors'][0]['field'] == 'password'
+
+    def test_create_user_password_must_contain_at_least_1_uppercase(self, client):
+        context = self._get_context(password='p@ssword')
+
+        response = self._create_users_with_context(client, context)
+
+        assert response.status_code == 400
+        json = response.json()
+
+        assert json['errors'][0]['code'] == '2013'
+        assert json['errors'][0]['field'] == 'password'
+
+    def test_create_user_password_must_contain_at_least_1_character(self, client):
+        context = self._get_context(password='Password')
+
+        response = self._create_users_with_context(client, context)
+
+        assert response.status_code == 400
+        json = response.json()
+
+        assert json['errors'][0]['code'] == '2013'
+        assert json['errors'][0]['field'] == 'password'
+
