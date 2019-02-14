@@ -9,6 +9,6 @@ class MustNotAuthenticated(NotRequireSerializerFriendlyErrorMessagesMixin, BaseP
         if bool(request.user and
                 request.user.is_authenticated):
             self.register_error_403(error_message='로그인된 유저로 실행할 수 없습니다.',
-                                    error_code='3022',
+                                    error_code='1003',
                                     field_name='user_failed')
         return True

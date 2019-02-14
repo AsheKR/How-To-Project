@@ -254,7 +254,7 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         json = response.json()
 
-        assert json['code'] == '3022'
+        assert json['code'] == '1003'
         assert json['field'] == 'user_failed'
         assert json['message'] == '로그인된 유저로 실행할 수 없습니다.'
 
@@ -275,7 +275,7 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         json = response.json()
 
-        assert json['code'] == '3021'
+        assert json['code'] == '1002'
         assert json['field'] == 'user_failed'
         assert json['message'] == '아이디 혹은 비밀번호가 잘못되었습니다.'
 
@@ -301,6 +301,6 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         json = response.json()
 
-        assert json['code'] == '3022'
+        assert json['code'] == '1003'
         assert json['field'] == 'user_failed'
         assert json['message'] == '로그인된 유저로 실행할 수 없습니다.'
