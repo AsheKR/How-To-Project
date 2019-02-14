@@ -101,7 +101,7 @@ class UserLoginSerializer(serializers.Serializer):
         }
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = (
