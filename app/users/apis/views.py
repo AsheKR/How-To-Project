@@ -6,6 +6,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from users.apis.permissions import MustNotAuthenticated
 from users.apis.serializers import UserCreateSerializer, UserLoginSerializer, UserProfileSerializer
 from users.models import UserRelation
 
@@ -18,6 +19,10 @@ class UserCreateGenericAPIView(generics.CreateAPIView):
 
 
 class UserLoginView(APIView):
+    permission_classes = (
+        MustNotAuthenticated,
+    )
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():

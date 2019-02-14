@@ -79,7 +79,7 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
         }
 
 
-class UserLoginSerializer(serializers.Serializer):
+class UserLoginSerializer(FriendlyErrorMessagesMixin, serializers.Serializer):
     user_id = serializers.CharField()
     password = serializers.CharField()
 
@@ -91,7 +91,9 @@ class UserLoginSerializer(serializers.Serializer):
         self.user = authenticate(user_id=attrs['user_id'], password=attrs['password'])
 
         if not self.user:
-            raise serializers.ValidationError({'detail': '유저 정보가 잘못되었습니다.'})
+            self.register_error(error_message='아이디 혹은 비밀번호가 잘못되었습니다.',
+                                error_code='3021',
+                                field_name='login_failed')
         return attrs
 
     def to_representation(self, instance):
