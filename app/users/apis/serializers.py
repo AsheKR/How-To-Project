@@ -95,6 +95,12 @@ class UserLoginSerializer(NotRequireSerializerFriendlyErrorMessagesMixin, serial
             self.register_error_400(error_message='아이디 혹은 비밀번호가 잘못되었습니다.',
                                     error_code='1002',
                                     field_name='user_failed')
+
+        if self.user.deleted_at:
+            self.register_error_403(error_message='삭제 진행중인 계정입니다.',
+                                    error_code='1004',
+                                    field_name='user_failed')
+
         return attrs
 
     def to_representation(self, instance):
