@@ -94,7 +94,7 @@ class UserLoginSerializer(NotRequireSerializerFriendlyErrorMessagesMixin, serial
         if not self.user:
             self.register_error_400(error_message='아이디 혹은 비밀번호가 잘못되었습니다.',
                                     error_code='3021',
-                                    field_name='login_failed')
+                                    field_name='user_failed')
         return attrs
 
     def to_representation(self, instance):
