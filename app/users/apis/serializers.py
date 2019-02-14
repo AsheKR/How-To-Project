@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework_friendly_errors.mixins import FriendlyErrorMessagesMixin
 
+from base.base_error_mixins import NotRequireSerializerFriendlyErrorMessagesMixin
 from users.models import UserRelation
 
 
@@ -79,7 +80,7 @@ class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializ
         }
 
 
-class UserLoginSerializer(FriendlyErrorMessagesMixin, serializers.Serializer):
+class UserLoginSerializer(NotRequireSerializerFriendlyErrorMessagesMixin, serializers.Serializer):
     user_id = serializers.CharField()
     password = serializers.CharField()
 
@@ -91,9 +92,9 @@ class UserLoginSerializer(FriendlyErrorMessagesMixin, serializers.Serializer):
         self.user = authenticate(user_id=attrs['user_id'], password=attrs['password'])
 
         if not self.user:
-            self.register_error(error_message='아이디 혹은 비밀번호가 잘못되었습니다.',
-                                error_code='3021',
-                                field_name='login_failed')
+            self.register_error_400(error_message='아이디 혹은 비밀번호가 잘못되었습니다.',
+                                    error_code='3021',
+                                    field_name='login_failed')
         return attrs
 
     def to_representation(self, instance):
