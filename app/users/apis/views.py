@@ -14,6 +14,9 @@ User = get_user_model()
 
 
 class UserCreateGenericAPIView(generics.CreateAPIView):
+    permission_classes = (
+        MustNotAuthenticated,
+    )
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
 
