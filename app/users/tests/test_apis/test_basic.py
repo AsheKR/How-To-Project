@@ -35,7 +35,9 @@ class TestUserBasicAPI(BaseTestMixin):
         return user, response
 
     def test_create_user_api_required_fields(self, client):
-        self._test_create_user_api(client)
+        _, response = self._test_create_user_api(client)
+
+        assert response.json()['token']
 
     def test_patch_user_api_fill_all_fields(self, client):
         _, response = self._test_create_user_api(client)
