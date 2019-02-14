@@ -88,3 +88,20 @@ class TestUserBasicAPI(BaseTestMixin):
         user = get_user_model().objects.get(pk=1)
 
         assert user.deleted_at
+
+    def test_retrieve_user_api_named_profile(self, client):
+        _, response = self._test_create_user_api(client)
+
+        response = client.get(resolve_url('users:profile', user_id='user_id'))
+
+        assert response.status_code == 200
+
+        json = response.json()
+
+        assert json.get('user_id') == 'user_id'
+        assert json.get('email') == 'email@email.com'
+        assert json.get('created_at')
+        assert json.get('description') is None
+        assert json.get('nickname') == 'nickname'
+
+        assert json.get('profile_image') is None
