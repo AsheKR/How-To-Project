@@ -181,6 +181,31 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         assert json['errors'][0]['field'] == 'password'
         assert '이 필드는 반드시 특수문자가 하나 이상 포함되어야 합니다.' in json['errors'][0]['message']
 
+    def test_retrieve_user_not_retrieve_non_user(self, client):
+        response = client.get(resolve_url('users:profile', user_id='user_id'))
+
+        assert response.status_code == 404
+
+    def test_retrieve_user_not_retrieve_deleted_user(self, client):
+        context = self._get_context(user_id='retrieve_me')
+
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.get(resolve_url('users:profile', user_id='retrieve_me'))
+
+        assert response.status_code == 200
+
+        _ = client.delete(resolve_url('users:me-profile'),
+                          **header, )
+
+        response = client.get(resolve_url('users:profile', user_id='retrieve_me'))
+
+        assert response.status_code == 404
+
 
 class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
