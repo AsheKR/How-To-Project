@@ -1,3 +1,6 @@
+from django.shortcuts import resolve_url
+from django.test.client import encode_multipart
+
 from base.base_test_mixins import BaseTestMixin
 
 
@@ -13,6 +16,26 @@ class BaseTestUserContext:
             'nickname': nickname,
         }
 
+    @staticmethod
+    def _get_patch_context(nickname='nickname', description='description', file=None):
+        return {
+            'nickname': nickname,
+            'description': description,
+            'file': file,
+        }
+
+    @staticmethod
+    def _patch_user_with_context(client, header, context):
+        enc_content = encode_multipart('BoUnDaRyStRiNg', context)
+        content_type = 'multipart/form-data; boundary=BoUnDaRyStRiNg'
+
+        response = client.patch(resolve_url('users:me-profile'),
+                                **header,
+                                data=enc_content,
+                                content_type=content_type)
+
+        return response
+
 
 class TestRequiredFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
@@ -27,6 +50,26 @@ class TestRequiredFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         for i, key in enumerate(tuple(context)):
             assert json['errors'][i]['code'] == '2031'
             assert json['errors'][i]['field'] == key
+
+    def test_patch_user_require_fields_occur_400(self, client):
+        context = self._get_context()
+
+        response = self._create_users_with_context(client, context)
+
+        context = self._get_patch_context('', '', '')
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = self._patch_user_with_context(client, header, context)
+
+        json = response.json()
+
+        assert response.status_code == 400
+        assert json['errors'][0]['code'] == 2031
+        assert json['errors'][0]['field'] == 'nickname'
+        assert json['errors'][0]['message'] == '이 필드는 blank일 수 없습니다.'
 
 
 class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
