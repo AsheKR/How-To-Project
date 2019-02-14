@@ -72,3 +72,19 @@ class TestUserBasicAPI(BaseTestMixin):
 
         assert user.profile_image.url in json.get('profile_image')
         assert os.path.exists(os.path.join(settings.MEDIA_ROOT, user.profile_image.path))
+
+    def test_delete_user_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.delete(resolve_url('users:me-profile'),
+                                 **header,)
+
+        assert response.status_code == 204
+
+        user = get_user_model().objects.get(pk=1)
+
+        assert user.deleted_at

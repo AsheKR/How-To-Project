@@ -67,7 +67,7 @@ class TestRequiredFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         json = response.json()
 
         assert response.status_code == 400
-        assert json['errors'][0]['code'] == 2031
+        assert json['errors'][0]['code'] == '2031'
         assert json['errors'][0]['field'] == 'nickname'
         assert json['errors'][0]['message'] == '이 필드는 blank일 수 없습니다.'
 
