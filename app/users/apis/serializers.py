@@ -104,9 +104,13 @@ class UserLoginSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        exclude = (
-            'password',
-            'deleted_at',
+        fields = (
+            'user_id',
+            'email',
+            'nickname',
+            'description',
+            'profile_image',
+            'created_at',
         )
         read_only_fields = (
             'email',
