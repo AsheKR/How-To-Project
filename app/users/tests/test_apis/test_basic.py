@@ -128,3 +128,16 @@ class TestUserBasicAPI(BaseTestMixin):
 
         assert json.get('profile_image') is None
 
+    def test_login_user_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        context = {
+            'user_id': 'user_id',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        assert response.status_code == 200
+        assert response.json()['token']
