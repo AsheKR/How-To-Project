@@ -238,6 +238,26 @@ class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
 class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
+    def test_create_user_cannot_create_with_logged_in_status(self, client):
+        context = self._get_context()
+
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.post(resolve_url('users:create'),
+                               **header)
+
+        assert response.status_code == 403
+
+        json = response.json()
+
+        assert json['code'] == '3022'
+        assert json['field'] == 'user_failed'
+        assert json['message'] == '로그인된 유저로 실행할 수 없습니다.'
+
     def test_login_user_login_fail(self, client):
         context = self._get_context()
 
@@ -256,7 +276,7 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         json = response.json()
 
         assert json['code'] == '3021'
-        assert json['field'] == 'login_failed'
+        assert json['field'] == 'user_failed'
         assert json['message'] == '아이디 혹은 비밀번호가 잘못되었습니다.'
 
     def test_login_user_cannot_get_token_with_logged_in_status(self, client):
@@ -282,5 +302,5 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         json = response.json()
 
         assert json['code'] == '3022'
-        assert json['field'] == 'login_failed'
+        assert json['field'] == 'user_failed'
         assert json['message'] == '로그인된 유저로 실행할 수 없습니다.'
