@@ -304,3 +304,32 @@ class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         assert json['code'] == '1003'
         assert json['field'] == 'user_failed'
         assert json['message'] == '로그인된 유저로 실행할 수 없습니다.'
+
+    def test_login_user_cannot_get_deleted_user(self, client):
+        context = self._get_context()
+
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = client.delete(resolve_url('users:me-profile'),
+                          **header,
+                          data=context, )
+
+        context = {
+            'user_id': 'asd123',
+            'password': 'P@ssw04d',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        assert response.status_code == 403
+
+        json = response.json()
+
+        assert json['code'] == '1004'
+        assert json['field'] == 'user_failed'
+        assert json['message'] == '삭제 진행중인 계정입니다.'
