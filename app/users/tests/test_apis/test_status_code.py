@@ -206,6 +206,19 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert response.status_code == 404
 
+    def test_not_retrieve_me_profile_by_anonymous_user(self, client):
+        response = client.get(resolve_url('users:me-profile', ))
+
+        assert response.status_code == 401
+
+        response = client.patch(resolve_url('users:me-profile', ))
+
+        assert response.status_code == 401
+
+        response = client.delete(resolve_url('users:me-profile', ))
+
+        assert response.status_code == 401
+
 
 class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
