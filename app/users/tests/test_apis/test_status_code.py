@@ -234,3 +234,32 @@ class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert json['errors'][0]['code'] == '3001'
         assert json['errors'][0]['field'] == 'email'
+
+
+class TestAnotherUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
+
+    def test_login_user_cannot_get_token_with_logged_in_status(self, client):
+        context = self._get_context()
+
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'user_id': 'asd123',
+            'password': 'P@ssw04d',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               **header,
+                               data=context, )
+
+        assert response.status_code == 403
+
+        json = response.json()
+
+        assert json['code'] == '3021'
+        assert json['field'] == 'login_failed'
+        assert json['message'] == '아이디 혹은 비밀번호가 잘못되었습니다.'
