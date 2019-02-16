@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from rest_framework import generics, status, permissions
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -66,8 +66,12 @@ class UserFollowingCreateListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         if not kwargs.get('user_id'):
+            if not request.user.is_authenticated:
+                raise NotAuthenticated()
             kwargs['user_id'] = request.user.user_id
-        queryset = User.objects.filter(from_user_relation__to_user__user_id=kwargs.get('user_id'),
+
+        user = get_object_or_404(User.objects.filter(deleted_at=None), user_id=kwargs.get('user_id'))
+        queryset = User.objects.filter(from_user_relation__to_user=user,
                                        from_user_relation__deleted_at=None,
                                        )
         serializer = UserProfileSerializer(queryset, many=True)
@@ -75,7 +79,7 @@ class UserFollowingCreateListAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            raise PermissionDenied({'detail': '로그인된 유저가 아닙니다.'})
+            raise NotAuthenticated()
         obj, created = UserRelation.objects.get_or_create(
             from_user=request.user,
             to_user=get_object_or_404(User.objects.filter(deleted_at=None), user_id=kwargs.get('user_id')),

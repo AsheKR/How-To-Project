@@ -6,7 +6,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework_friendly_errors.mixins import FriendlyErrorMessagesMixin
 
 from base.base_error_mixins import NotRequireSerializerFriendlyErrorMessagesMixin
-from users.models import UserRelation
 
 
 class UserCreateSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializer):
@@ -124,12 +123,4 @@ class UserProfileSerializer(FriendlyErrorMessagesMixin, serializers.ModelSeriali
         read_only_fields = (
             'email',
             'user_id',
-        )
-
-
-class UserRelationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserRelation
-        exclude = (
-            'deleted_at',
         )
