@@ -159,6 +159,47 @@ class TestUserBasicAPI(BaseTestMixin):
         assert response.status_code == 201
         assert UserRelation.objects.filter(from_user__user_id='user_id', to_user__user_id='target').exists()
 
+    def test_un_follow_user_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        target = self._test_create_user_api(client, user_id='target', email='ea@ea.com')
+
+        response = self._create_follow(client, header, 'target')
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 204
+        assert not UserRelation.objects.filter(from_user__user_id='user_id',
+                                               to_user__user_id='target',
+                                               deleted_at=None).exists()
+
+    def test_re_follow_user_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        target = self._test_create_user_api(client, user_id='target', email='ea@ea.com')
+
+        response = self._create_follow(client, header, 'target')
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 204
+        assert not UserRelation.objects.filter(from_user__user_id='user_id',
+                                               to_user__user_id='target',
+                                               deleted_at=None).exists()
+
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 201
+        assert UserRelation.objects.filter(from_user__user_id='user_id',
+                                           to_user__user_id='target',
+                                           deleted_at=None).exists()
+
     def test_get_following_list_api(self, client):
         _, response = self._test_create_user_api(client)
 
