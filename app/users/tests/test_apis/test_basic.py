@@ -7,6 +7,7 @@ from django.shortcuts import resolve_url
 from django.test.client import encode_multipart
 
 from base.base_test_mixins import BaseTestMixin
+from users.models import UserRelation
 
 
 class TestUserBasicAPI(BaseTestMixin):
@@ -15,11 +16,11 @@ class TestUserBasicAPI(BaseTestMixin):
         if os.path.exists(settings.MEDIA_ROOT):
             shutil.rmtree(settings.MEDIA_ROOT)
 
-    def _test_create_user_api(self, client):
+    def _test_create_user_api(self, client, user_id='user_id', email='email@email.com'):
         context = {
-            'user_id': 'user_id',
+            'user_id': user_id,
             'password': 'P@ssw0rd',
-            'email': 'email@email.com',
+            'email': email,
             'nickname': 'nickname'
         }
 
@@ -27,7 +28,7 @@ class TestUserBasicAPI(BaseTestMixin):
 
         assert response.status_code == 201
 
-        user = get_user_model().objects.get(pk=1)
+        user = get_user_model().objects.last()
 
         assert user.user_id == context['user_id']
         assert user.password
@@ -143,3 +144,17 @@ class TestUserBasicAPI(BaseTestMixin):
 
         assert response.status_code == 200
         assert response.json()['token']
+
+    def test_following_user_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        target = self._test_create_user_api(client, user_id='target', email='ea@ea.com')
+
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 201
+        assert UserRelation.objects.filter(from_user__user_id='user_id', to_user__user_id='target').exists()
