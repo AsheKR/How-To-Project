@@ -203,3 +203,48 @@ class TestUserBasicAPI(BaseTestMixin):
 
         assert response.status_code == 200
         assert len(response.json()) == 1
+
+    def test_get_follower_list_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        target = self._test_create_user_api(client, user_id='target', email='ea@ea.com')
+
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 201
+
+        response = client.get(resolve_url('users:follower', user_id='user_id'))
+
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+    def test_get_follower_me_list_api(self, client):
+        _, response = self._test_create_user_api(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _, target = self._test_create_user_api(client, user_id='target', email='ea@ea.com')
+
+        response = self._create_follow(client, header, 'target')
+
+        assert response.status_code == 201
+
+        response = client.get(resolve_url('users:me-follower'), **header)
+
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + target.json()['token'],
+        }
+
+        response = client.get(resolve_url('users:me-follower'), **header)
+
+        assert response.status_code == 200
+        assert len(response.json()) == 0
