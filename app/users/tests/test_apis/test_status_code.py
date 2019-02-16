@@ -222,7 +222,7 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
     def test_following_non_user(self, client):
         response = self._create_follow(client, {}, 'target')
 
-        assert response.status_code == 403
+        assert response.status_code == 401
 
     def test_following_deleted_user(self, client):
         user = self._create_users_with_context(client, self._get_context(user_id='asd123', email='qwe@asd.com'))
@@ -244,6 +244,35 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
         response = self._create_follow(client, header, 'deleted_user')
 
         assert response.status_code == 404
+
+    def test_get_following_list_non_user(self, client):
+        response = client.get(resolve_url('users:following', user_id='non'))
+
+        json = response.json()
+
+        assert response.status_code == 404
+
+    def test_get_following_list_deleted_user(self, client):
+        user = self._create_users_with_context(client, self._get_context(user_id='asd123', email='qwe@asd.com'))
+        context = self._get_context(user_id='deleted_user')
+
+        deleted_user = self._create_users_with_context(client, context)
+
+        deleted_header = {
+            'HTTP_AUTHORIZATION': 'Token ' + deleted_user.json()['token'],
+        }
+
+        _ = client.delete(resolve_url('users:me-profile'),
+                          **deleted_header, )
+
+        response = client.get(resolve_url('users:following', user_id='deleted_user'))
+
+        assert response.status_code == 404
+
+    def test_get_following_list_by_anonymous_user(self, client):
+        response = client.get(resolve_url('users:me-following'))
+
+        assert response.status_code == 401
 
 
 class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
