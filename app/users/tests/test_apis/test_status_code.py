@@ -219,6 +219,32 @@ class TestValidateFieldUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
         assert response.status_code == 401
 
+    def test_following_non_user(self, client):
+        response = self._create_follow(client, {}, 'target')
+
+        assert response.status_code == 403
+
+    def test_following_deleted_user(self, client):
+        user = self._create_users_with_context(client, self._get_context(user_id='asd123', email='qwe@asd.com'))
+        context = self._get_context(user_id='deleted_user')
+
+        deleted_user = self._create_users_with_context(client, context)
+
+        deleted_header = {
+            'HTTP_AUTHORIZATION': 'Token ' + deleted_user.json()['token'],
+        }
+
+        _ = client.delete(resolve_url('users:me-profile'),
+                          **deleted_header, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + user.json()['token'],
+        }
+
+        response = self._create_follow(client, header, 'deleted_user')
+
+        assert response.status_code == 404
+
 
 class TestUniqueConstraintUserStatusCodeAPI(BaseTestMixin, BaseTestUserContext):
 
