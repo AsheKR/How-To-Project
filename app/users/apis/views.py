@@ -102,9 +102,13 @@ class UserFollowerListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         if not kwargs.get('user_id'):
+            if not request.user.is_authenticated:
+                raise NotAuthenticated()
             kwargs['user_id'] = request.user.user_id
 
-        queryset = User.objects.filter(to_user_relation__from_user__user_id=kwargs.get('user_id'),
+        user = get_object_or_404(User.objects.filter(deleted_at=None), user_id=kwargs.get('user_id'))
+
+        queryset = User.objects.filter(to_user_relation__from_user=user,
                                        to_user_relation__deleted_at=None,
                                        )
         serializer = UserProfileSerializer(queryset, many=True)
