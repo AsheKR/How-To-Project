@@ -18,17 +18,14 @@ class BaseTestMixin:
         return open(f.name, mode='rb')
 
     @staticmethod
-    def _create_users(client, dump):
-        context = {
-            'user_id': dump,
-            'password': 'asd',
-            'email': dump + '@' + dump + '.com',
-            'nickname': dump,
+    def _get_user_context(user_id='asd123', password='P@ssw04d',
+                          email='test@test.com', nickname='지존짱짱맨'):
+        return {
+            'user_id': user_id,
+            'password': password,
+            'email': email,
+            'nickname': nickname,
         }
-
-        response = client.post(resolve_url('users:create'),
-                               data=context)
-        return response
 
     @staticmethod
     def _create_users_with_context(client, context):
