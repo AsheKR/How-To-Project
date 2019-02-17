@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,11 @@ class PostCategoryListGenericAPIView(generics.ListAPIView):
 class PostListCreateGenericAPIView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise NotAuthenticated()
+        return super().post(request, *args, **kwargs)
 
 
 class PostRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
