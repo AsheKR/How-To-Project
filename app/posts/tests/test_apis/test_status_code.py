@@ -61,3 +61,4 @@ class TestValidateFieldPostStatusCodeAPI(BaseTestMixin):
         json = response.json()
 
         assert response.status_code == 401
+
