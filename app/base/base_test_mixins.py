@@ -46,3 +46,17 @@ class BaseTestMixin:
     def _create_post_category():
         PostCategory.objects.create(name='category1')
         PostCategory.objects.create(name='category2')
+
+    @staticmethod
+    def _create_post(client, header, category='1', title='title1', content='content'):
+        context = {
+            'category': category,
+            'title': title,
+            'content': content,
+        }
+
+        response = client.post(resolve_url('posts:list_create'),
+                               **header,
+                               data=context)
+
+        return response
