@@ -1,9 +1,11 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from posts.apis.filters import PostFilter
 from posts.apis.serializers import PostCategorySerializer, PostSerializer
 from posts.models import PostCategory, Post
 
@@ -16,6 +18,8 @@ class PostCategoryListGenericAPIView(generics.ListAPIView):
 class PostListCreateGenericAPIView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = PostFilter
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

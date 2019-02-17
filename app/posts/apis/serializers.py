@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
 from rest_framework_friendly_errors.mixins import FriendlyErrorMessagesMixin
 
 from posts.models import PostCategory, Post
@@ -15,8 +13,7 @@ class PostCategorySerializer(serializers.ModelSerializer):
 class PostSerializer(FriendlyErrorMessagesMixin, serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
-        exclude_fields = (
+        exclude = (
             'deleted_at',
             'like_users',
         )
