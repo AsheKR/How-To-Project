@@ -1,9 +1,7 @@
 import pytest
 
-from base.base_test_mixins import BaseTestMixin
 
-
-class TestUserModel(BaseTestMixin):
+class TestUserModel:
 
     def test_required_fields(self, django_user_model):
         user_info = (
