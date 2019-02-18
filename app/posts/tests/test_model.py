@@ -51,3 +51,21 @@ class TestPostModel:
         assert not post.deleted_at
         post.delete()
         assert post.deleted_at
+
+    def test_post_like(self):
+        post_info = (
+            ('author', self.user),
+            ('category', self.category),
+            ('title', 'title1'),
+            ('content', 'content'),
+        )
+
+        post = Post.objects.create(
+            **dict(post_info),
+        )
+
+        assert post.like_users.count() == 0
+        post.like_toggle(self.user)
+        assert post.like_users.count() == 1
+        post.like_toggle(self.user)
+        assert post.like_users.count() == 0
