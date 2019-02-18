@@ -69,6 +69,74 @@ class TestPostAPI(BaseTestMixin):
         assert json[0]['author']
         assert json[0]['category']
 
+    def test_get_post_api(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        response = client.get(resolve_url('posts:retrieve_update_destroy', pk=1))
+
+        assert response.status_code == 200
+
+        json = response.json()
+
+        assert json['id']
+        assert json['created_at']
+        assert json['modified_at']
+        assert json['title']
+        assert json['content']
+        assert json['author']
+        assert json['category']
+
+    def test_patch_post_api(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        context = {
+            'content': 'changed',
+            'title': 'change title',
+            'category': '2'
+        }
+
+        response = client.patch(resolve_url('posts:retrieve_update_destroy', pk=1),
+                                **header,
+                                data=context,
+                                content_type='application/json')
+
+        assert response.status_code == 200
+
+        json = response.json()
+
+        assert json['content'] == 'changed'
+        assert json['title'] == 'change title'
+        assert json['category'] == 2
+
+    def test_delete_post_api(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        response = client.delete(resolve_url('posts:retrieve_update_destroy', pk=1),
+                                 **header)
+
+        assert response.status_code == 204
+
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
 
