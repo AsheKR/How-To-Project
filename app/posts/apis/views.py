@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from posts.apis.filters import PostFilter
+from posts.apis.permissions import PostUpdateDestroyMustBeOwner
 from posts.apis.serializers import PostCategorySerializer, PostSerializer
 from posts.models import PostCategory, Post
 
@@ -28,8 +29,11 @@ class PostListCreateGenericAPIView(generics.ListCreateAPIView):
 
 
 class PostRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(deleted_at=None)
     serializer_class = PostSerializer
+    permission_classes = (
+        PostUpdateDestroyMustBeOwner,
+    )
 
 
 class PostLikeToggleAPIView(APIView):
