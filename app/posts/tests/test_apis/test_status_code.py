@@ -299,3 +299,74 @@ class TestValidateFieldPostStatusCodeAPI(BaseTestMixin):
 
         assert response.status_code == 404
 
+    def test_like_post_anonymous_user_occur_401(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        response = client.post(resolve_url('posts:like', pk=1))
+
+        assert response.status_code == 401
+
+    def test_like_post_not_exists_occur_404(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        response = client.post(resolve_url('posts:like', pk=2),
+                               **header)
+
+        assert response.status_code == 404
+
+    def test_like_post_deleted_post_occur_404(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+        _ = client.delete(resolve_url('posts:retrieve_update_destroy', pk=1),
+                          **header)
+
+        context = self._get_user_context(user_id='another_user', email='email@e.com')
+        another_response = self._create_users_with_context(client, context)
+
+        another_header = {
+            'HTTP_AUTHORIZATION': 'Token ' + another_response.json()['token'],
+        }
+
+        response = client.post(resolve_url('posts:like', pk=1),
+                               **another_header)
+
+        assert response.status_code == 404
+
+    def test_like_post_cannot_like_author_self_post(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        response = client.post(resolve_url('posts:like', pk=1),
+                               **header)
+
+        assert response.status_code == 403
+
+        json = response.json()
+
+        assert json['code'] == '1101'
+        assert json['message'] == '자신의 포스트에는 좋아요를 누를 수 없습니다.'
+        assert json['field'] == 'like'
