@@ -137,6 +137,28 @@ class TestPostAPI(BaseTestMixin):
 
         assert response.status_code == 204
 
+    def test_like_post_api(self, client):
+        context = self._get_user_context()
+        response = self._create_users_with_context(client, context)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        _ = self._create_post(client, header, category='1')
+
+        context = self._get_user_context(user_id='another_user', email='email@e.com')
+        another_response = self._create_users_with_context(client, context)
+
+        another_header = {
+            'HTTP_AUTHORIZATION': 'Token ' + another_response.json()['token'],
+        }
+
+        response = client.post(resolve_url('posts:like', pk=1),
+                               **another_header)
+
+        assert response.status_code == 201
+
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
 
