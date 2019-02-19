@@ -414,4 +414,55 @@ class TestRequireFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
 
 class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
-    pass
+
+    def setup_method(self, method):
+        user = get_user_model().objects.create_user(
+            user_id='test123',
+            password='P@ssw0rd',
+            email='email@email.com',
+        )
+        self.header = {
+            'HTTP_AUTHORIZATION': 'Token ' + Token.objects.get_or_create(user=user)[0].key
+        }
+
+        category = PostCategory.objects.create(name='category1')
+
+        Post.objects.create(
+            author=user,
+            category=category,
+            title='title1',
+            content='content',
+        )
+
+    def test_create_post_comment_anonymous_user_occur_401(self, client):
+        context = {
+            'content': 'Comment is here'
+        }
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               data=context)
+
+        assert response.status_code == 401
+
+    def test_create_post_comment_not_exists_occur_404(self, client):
+        context = {
+            'content': 'Comment is here'
+        }
+        response = client.post(resolve_url('posts:comment', pk=2),
+                               data=context,
+                               **self.header,)
+
+        assert response.status_code == 404
+
+    def test_create_post_comment_deleted_post_occur_404(self, client):
+        context = {
+            'content': 'Comment is here'
+        }
+
+        _ = client.delete(resolve_url('posts:retrieve_update_destroy', pk=1),
+                          **self.header)
+
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               data=context,
+                               **self.header,)
+
+        assert response.status_code == 404
