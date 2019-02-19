@@ -202,7 +202,7 @@ class TestPostCommentAPI(BaseTestMixin):
 
         assert response.status_code == 201
 
-    def test_update_post_comment_api(self, client):
+    def test_patch_post_comment_api(self, client):
         context = {
             'user_id': 'test123',
             'password': 'P@ssw0rd',
