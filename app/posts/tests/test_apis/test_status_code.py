@@ -398,7 +398,7 @@ class TestRequireFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
     def test_create_post_comment_require_fields_occur_404(self, client):
         context = {
-
+            'content': ''
         }
         response = client.post(resolve_url('posts:comment', pk=1),
                                data=context,
@@ -408,8 +408,8 @@ class TestRequireFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
         json = response.json()
 
-        assert json['errors'][0]['code'] == '2002'
-        assert json['errors'][0]['message'] == '이 필드는 필수 항목입니다.'
+        assert json['errors'][0]['code'] == '2031'
+        assert json['errors'][0]['message'] == '이 필드는 blank일 수 없습니다.'
         assert json['errors'][0]['field'] == 'content'
 
 
