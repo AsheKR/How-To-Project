@@ -179,27 +179,28 @@ class TestPostCommentAPI(BaseTestMixin):
             content='content',
         )
 
-    # def test_create_post_comment_api(self, client):
-    #     context = {
-    #         'user_id': 'test123',
-    #         'password': 'P@ssw0rd',
-    #     }
-    #
-    #     response = client.post(resolve_url('users:login'),
-    #                            data=context, )
-    #
-    #     header = {
-    #         'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
-    #     }
-    #
-    #     context = {
-    #         'content': 'comment',
-    #     }
-    #
-    #     response = client.post(resolve_url('posts:comment', pk=1),
-    #                            **header)
-    #
-    #     assert response.status_code == 201
+    def test_create_post_comment_api(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+        }
+
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               **header,
+                               data=context)
+
+        assert response.status_code == 201
 
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
