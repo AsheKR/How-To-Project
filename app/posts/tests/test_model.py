@@ -127,3 +127,21 @@ class TestPostCommentModel:
         assert not post_comment.deleted_at
         post_comment.delete()
         assert post_comment.deleted_at
+
+    def test_post_comment_reply(self):
+        comment_info = (
+            ('author', self.user),
+            ('post', self.post),
+            ('content', 'comment'),
+        )
+
+        post_comment = PostComment.objects.create(
+            **dict(comment_info),
+        )
+
+        post_reply = PostComment.objects.create(
+            **dict(comment_info),
+            parent=post_comment,
+        )
+
+        assert post_comment.postcomment_set.last() == post_reply
