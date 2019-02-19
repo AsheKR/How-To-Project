@@ -232,6 +232,34 @@ class TestPostCommentAPI(BaseTestMixin):
 
         assert response.status_code == 200
 
+    def test_delete_post_comment_api(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+        }
+
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        **header,
+                        data=context)
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                             post_pk=1,
+                                             pk=1),
+                                 **header)
+
+        assert response.status_code == 204
+
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
 
