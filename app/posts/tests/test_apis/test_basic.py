@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url
 
 from base.base_test_mixins import BaseTestMixin
+from posts.models import PostCategory, Post
 
 
 class TestPostCategoryAPI(BaseTestMixin):
@@ -158,6 +160,46 @@ class TestPostAPI(BaseTestMixin):
                                **another_header)
 
         assert response.status_code == 201
+
+
+class TestPostCommentAPI(BaseTestMixin):
+
+    def setup_method(self, client):
+        self.user = get_user_model().objects.create_user(
+            user_id='test123',
+            password='P@ssw0rd',
+            email='email@email.com',
+        )
+        self.category = PostCategory.objects.create(name='category1')
+
+        self.post = Post.objects.create(
+            author=self.user,
+            category=self.category,
+            title='title1',
+            content='content',
+        )
+
+    # def test_create_post_comment_api(self, client):
+    #     context = {
+    #         'user_id': 'test123',
+    #         'password': 'P@ssw0rd',
+    #     }
+    #
+    #     response = client.post(resolve_url('users:login'),
+    #                            data=context, )
+    #
+    #     header = {
+    #         'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+    #     }
+    #
+    #     context = {
+    #         'content': 'comment',
+    #     }
+    #
+    #     response = client.post(resolve_url('posts:comment', pk=1),
+    #                            **header)
+    #
+    #     assert response.status_code == 201
 
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
