@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from base.base_error_mixins import NotRequireSerializerFriendlyErrorMessagesMixin
 from posts.apis.filters import PostFilter
 from posts.apis.permissions import PostUpdateDestroyMustBeOwner
-from posts.apis.serializers import PostCategorySerializer, PostSerializer
-from posts.models import PostCategory, Post
+from posts.apis.serializers import PostCategorySerializer, PostSerializer, PostCommentSerializer
+from posts.models import PostCategory, Post, PostComment
 
 
 class PostCategoryListGenericAPIView(generics.ListAPIView):
@@ -34,6 +34,14 @@ class PostRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIV
     serializer_class = PostSerializer
     permission_classes = (
         PostUpdateDestroyMustBeOwner,
+    )
+
+
+class PostCommentCreateGenericAPIView(generics.CreateAPIView):
+    queryset = PostComment.objects.filter(deleted_at=None)
+    serializer_class = PostCommentSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
     )
 
 

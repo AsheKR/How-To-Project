@@ -10,5 +10,7 @@ urlpatterns = [
          name='retrieve_update_destroy'),
     path('<int:pk>/like/', views.PostLikeToggleAPIView.as_view(),
          name='like'),
+    path('<int:pk>/comment/', views.PostCommentCreateGenericAPIView.as_view(),
+         name='comment'),
     path('category/', views.PostCategoryListGenericAPIView.as_view(), name='category'),
 ]
