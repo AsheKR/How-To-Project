@@ -514,7 +514,7 @@ class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
         assert response.status_code == 401
 
-    def test_patch_post_comment_not_exists_user_occur_404(self, client):
+    def test_patch_post_comment_not_exists_post_occur_404(self, client):
         context = {
             'content': 'Comment is this'
         }
@@ -527,8 +527,8 @@ class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
         }
 
         response = client.patch(resolve_url('posts:comment_update_delete',
-                                            post_pk=1,
-                                            pk=2),
+                                            post_pk=2,
+                                            pk=1),
                                 data=context,
                                 content_type='application/json')
 
@@ -583,5 +583,117 @@ class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
                                 data=context,
                                 **self.header,
                                 content_type='application/json')
+
+        assert response.status_code == 404
+
+    def test_delete_post_comment_anonymous_user_occur_401(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                             post_pk=1,
+                                             pk=1))
+
+        assert response.status_code == 401
+
+    def test_delete_post_comment_not_exists_post_occur_404(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                             post_pk=2,
+                                             pk=1),
+                                 **self.header,
+                                 data=context,
+                                 content_type='application/json')
+
+        assert response.status_code == 404
+
+    def test_delete_post_comment_not_exists_post_comment_occur_404(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                             post_pk=1,
+                                             pk=2),
+                                 data=context,
+                                 **self.header,
+                                 content_type='application/json')
+
+        assert response.status_code == 404
+
+    def test_delete_post_comment_deleted_post_occur_404(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        _ = client.delete(resolve_url('posts:retrieve_update_destroy', pk=1),
+                          **self.header,
+                          data=context)
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                            post_pk=1,
+                                            pk=1),
+                                data=context,
+                                **self.header,
+                                content_type='application/json')
+
+        assert response.status_code == 404
+
+    def test_delete_post_comment_deleted_post_comment_occur_404(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        _ = client.delete(resolve_url('posts:comment_update_delete',
+                                      post_pk=1,
+                                      pk=1),
+                          **self.header,
+                          data=context)
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        response = client.delete(resolve_url('posts:comment_update_delete',
+                                             post_pk=1,
+                                             pk=1),
+                                 data=context,
+                                 **self.header,
+                                 content_type='application/json')
 
         assert response.status_code == 404
