@@ -12,5 +12,8 @@ urlpatterns = [
          name='like'),
     path('<int:pk>/comment/', views.PostCommentCreateGenericAPIView.as_view(),
          name='comment'),
+    path('<int:post_pk>/comment/<int:pk>/',
+         views.PostCommentUpdateDestroyGenericAPIView.as_view(),
+         name='comment_update_delete'),
     path('category/', views.PostCategoryListGenericAPIView.as_view(), name='category'),
 ]
