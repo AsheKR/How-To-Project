@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url
+from rest_framework.authtoken.models import Token
 
 from base.base_test_mixins import BaseTestMixin
+from posts.models import Post, PostCategory
 
 
 class TestRequiredFieldPostStatusCodeAPI(BaseTestMixin):
@@ -370,3 +373,45 @@ class TestValidateFieldPostStatusCodeAPI(BaseTestMixin):
         assert json['code'] == '1101'
         assert json['message'] == '자신의 포스트에는 좋아요를 누를 수 없습니다.'
         assert json['field'] == 'like'
+
+
+class TestRequireFieldPostCommentStatusCodeAPI(BaseTestMixin):
+
+    def setup_method(self, method):
+        user = get_user_model().objects.create_user(
+            user_id='test123',
+            password='P@ssw0rd',
+            email='email@email.com',
+        )
+        self.header = {
+            'HTTP_AUTHORIZATION': 'Token ' + Token.objects.get_or_create(user=user)[0].key
+        }
+
+        category = PostCategory.objects.create(name='category1')
+
+        Post.objects.create(
+            author=user,
+            category=category,
+            title='title1',
+            content='content',
+        )
+
+    def test_create_post_comment_require_fields_occur_404(self, client):
+        context = {
+
+        }
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               data=context,
+                               **self.header,)
+
+        assert response.status_code == 400
+
+        json = response.json()
+
+        assert json['errors'][0]['code'] == '2002'
+        assert json['errors'][0]['message'] == '이 필드는 필수 항목입니다.'
+        assert json['errors'][0]['field'] == 'content'
+
+
+class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
+    pass
