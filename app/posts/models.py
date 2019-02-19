@@ -57,6 +57,13 @@ class PostComment(BaseIsDeletedModel):
         max_length=100,
     )
 
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save()
