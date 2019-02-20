@@ -780,3 +780,38 @@ class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
         assert response.status_code == 403
 
+    def test_create_post_comment_reply_not_exists_parent_occur_404(self, client):
+        context = {
+            'content': 'Comment is here'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header)
+
+        context = {
+            'content': 'Reply is here',
+            'parent': 3,
+        }
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               data=context,
+                               **self.header)
+
+        assert response.status_code == 404
+
+    def test_create_post_comment_reply_not_exists_mention_user_occur_404(self, client):
+        context = {
+            'content': 'Comment is here'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header)
+
+        context = {
+            'content': 'Reply is here',
+            'mention': 'no_user',
+        }
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               data=context,
+                               **self.header)
+
+        assert response.status_code == 404
