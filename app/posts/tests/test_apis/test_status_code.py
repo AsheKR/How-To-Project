@@ -606,6 +606,37 @@ class TestValidationFieldPostCommentStatusCodeAPI(BaseTestMixin):
 
         assert response.status_code == 404
 
+    def test_patch_post_comment_must_owner(self, client):
+        context = {
+            'content': 'Comment is this'
+        }
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        data=context,
+                        **self.header, )
+
+        context = {
+            'content': 'Comment Changed'
+        }
+
+        another_user = get_user_model().objects.create_user(
+            user_id='another123',
+            password='P@ssw0rd',
+            email='ano@ther.com',
+        )
+
+        another_header = {
+            'HTTP_AUTHORIZATION': 'Token ' + Token.objects.get_or_create(user=another_user)[0].key
+        }
+
+        response = client.patch(resolve_url('posts:comment_update_delete',
+                                            post_pk=1,
+                                            pk=1),
+                                data=context,
+                                **another_header,
+                                content_type='application/json')
+
+        assert response.status_code == 403
+
     def test_delete_post_comment_anonymous_user_occur_401(self, client):
         context = {
             'content': 'Comment is this'
