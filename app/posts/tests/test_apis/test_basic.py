@@ -290,6 +290,95 @@ class TestPostCommentAPI(BaseTestMixin):
 
         assert response.status_code == 204
 
+    def test_create_post_comment_api_with_mention(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+            'mention': 1,
+        }
+
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        **header,
+                        data=context)
+
+        assert response.status_code == 201
+
+    def test_create_post_comment_reply(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+        }
+
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        **header,
+                        data=context)
+
+        context = {
+            'content': 'reply',
+            'parent': 1,
+        }
+
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               **header,
+                               data=context)
+
+        assert response.status_code == 201
+
+    def test_create_post_comment_reply_api_with_mention(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+        }
+
+        _ = client.post(resolve_url('posts:comment', pk=1),
+                        **header,
+                        data=context)
+
+        context = {
+            'content': 'reply',
+            'parent': 1,
+            'mention': 1,
+        }
+
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               **header,
+                               data=context)
+
+        assert response.status_code == 201
+
 
 class TestFilteringPostStatusCodeAPI(BaseTestMixin):
 
