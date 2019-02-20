@@ -145,3 +145,22 @@ class TestPostCommentModel:
         )
 
         assert post_comment.postcomment_set.last() == post_reply
+
+    def test_post_comment_reply_with_mentions(self):
+        comment_info = (
+            ('author', self.user),
+            ('post', self.post),
+            ('content', 'comment'),
+        )
+
+        post_comment = PostComment.objects.create(
+            **dict(comment_info),
+        )
+
+        post_reply = PostComment.objects.create(
+            **dict(comment_info),
+            parent=post_comment,
+            mention=self.user,
+        )
+
+        assert post_comment.postcomment_set.last() == post_reply

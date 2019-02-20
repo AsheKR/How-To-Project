@@ -64,6 +64,15 @@ class PostComment(BaseIsDeletedModel):
         null=True,
     )
 
+    mention = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name='comment_mentions',
+        related_query_name='comment_mention',
+    )
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save()
