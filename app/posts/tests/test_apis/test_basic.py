@@ -179,6 +179,36 @@ class TestPostCommentAPI(BaseTestMixin):
             content='content',
         )
 
+    def test_get_list_post_comment_api(self, client):
+        context = {
+            'user_id': 'test123',
+            'password': 'P@ssw0rd',
+        }
+
+        response = client.post(resolve_url('users:login'),
+                               data=context, )
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + response.json()['token'],
+        }
+
+        context = {
+            'content': 'comment',
+        }
+
+        for i in range(0, 5):
+            client.post(resolve_url('posts:comment', pk=1),
+                        **header,
+                        data=context)
+
+        response = client.get(resolve_url('posts:comment', pk=1))
+
+        assert response.status_code == 200
+
+        json = response.json()
+
+        assert len(json) == 5
+
     def test_create_post_comment_api(self, client):
         context = {
             'user_id': 'test123',
