@@ -305,12 +305,12 @@ class TestPostCommentAPI(BaseTestMixin):
 
         context = {
             'content': 'comment',
-            'mention': 1,
+            'mention': 'test123',
         }
 
-        _ = client.post(resolve_url('posts:comment', pk=1),
-                        **header,
-                        data=context)
+        response = client.post(resolve_url('posts:comment', pk=1),
+                               **header,
+                               data=context)
 
         assert response.status_code == 201
 
@@ -370,7 +370,7 @@ class TestPostCommentAPI(BaseTestMixin):
         context = {
             'content': 'reply',
             'parent': 1,
-            'mention': 1,
+            'mention': 'test123',
         }
 
         response = client.post(resolve_url('posts:comment', pk=1),
