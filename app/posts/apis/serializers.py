@@ -66,7 +66,7 @@ class PostCommentSerializer(FriendlyErrorMessagesMixin, serializers.ModelSeriali
 
         if self.context.get('request').data.get('mention'):
             mention = get_object_or_404(get_user_model().objects.filter(deleted_at=None),
-                                        pk=self.context.get('request').data.get('mention'))
+                                        user_id=self.context.get('request').data.get('mention'))
             validated_data['mention'] = mention
 
         instance = PostComment.objects.create(
