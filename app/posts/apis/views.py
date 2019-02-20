@@ -37,12 +37,17 @@ class PostRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIV
     )
 
 
-class PostCommentCreateGenericAPIView(generics.CreateAPIView):
+class PostCommentListCreateGenericAPIView(generics.ListCreateAPIView):
     queryset = PostComment.objects.filter(deleted_at=None)
     serializer_class = PostCommentSerializer
     permission_classes = (
-        permissions.IsAuthenticated,
+        permissions.IsAuthenticatedOrReadOnly,
     )
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset.filter(post__pk=self.kwargs.get('pk'))
+        return queryset
 
 
 class PostCommentUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
