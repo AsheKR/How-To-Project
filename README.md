@@ -3,9 +3,9 @@
 사용자가 입력하여 보여주는 시스템은 사용자의 참여율이 저조할 수 있다.
 정보를 크롤링하여 보여줄 수 있는 시스템을 생각해보자..
 
-## 기능 마인드맵
+## 기능 
 
-[MindMeister](https://www.mindmeister.com/1214789074)
+user, post api
 
 ## Database 설계
 
